@@ -95,7 +95,6 @@
         };
 
         var displayCounter = function(){
-        	// alert(plugin.settings.objElements.length);
         	htmlCounter = '<div class="paginateCounter">';
 
         	htmlCounter += '<span class="paginateRange"></span>';
@@ -138,7 +137,6 @@
         };
 
         var updateCounter = function(page) {
-        	console.log(plugin.settings.objElements);
         	rangeStart = (page - 1) * plugin.settings.elementsPerPage + 1;
         	rangeEnd = getNbOfPages() == page ? plugin.settings.objElements.length : page * plugin.settings.elementsPerPage;
         	$('.paginateRange').text(rangeStart + "-" + rangeEnd);
