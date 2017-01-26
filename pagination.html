@@ -117,15 +117,15 @@
 
             switch (plugin.settings.currentPage) {
               case 1:
-                $('.paginateNav a', plugin).removeClass('disabled');
-                $('.paginateNav a.first, .paginateNav a.prev', plugin).addClass('disabled');
+                $('.paginateNav a').removeClass('disabled');
+                $('.paginateNav a.first, .paginateNav a.prev').addClass('disabled');
                 break;
               case plugin.settings.pages:
                 $('.paginateNav a', plugin).removeClass('disabled');
-                $('.paginateNav a.last, .paginateNav a.next', plugin).addClass('disabled');
+                $('.paginateNav a.last, .paginateNav a.next').addClass('disabled');
                 break;
               default:
-                $('.paginateNav a', plugin).removeClass('disabled');
+                $('.paginateNav a').removeClass('disabled');
                 break;
             }
 
