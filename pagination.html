@@ -33,7 +33,7 @@
         plugin.settings = {
           pages: 0,
           objElements: Object,
-          currentPage: 1
+          currentPage: 0
         }
 
         var getNbOfPages = function() {
@@ -66,9 +66,9 @@
 
           htmlNav += '</div>';
           plugin.nav = $(htmlNav);
-          plugin.nav.css({
-            'width': plugin.el.width()
-          });
+          // plugin.nav.css({
+          //   'width': plugin.el.width()
+          // });
           plugin.el.after(plugin.nav);
 
           var elSelector = '#' + plugin.el.get(0).id + ' + ';
@@ -76,7 +76,6 @@
           $(elSelector + ' .paginateNav a.page,' + elSelector + ' .paginateNav a.first,' + elSelector + ' .paginateNav a.last').on('click', function(e) {
             e.preventDefault();
             displayPage($(this).attr('rel'));
-            console.log(this);
           });
 
           $('.paginateNav a.prev').on('click', function(e) {
@@ -90,6 +89,16 @@
             page = plugin.settings.currentPage < plugin.settings.pages ? parseInt(plugin.settings.currentPage) + 1 : plugin.settings.pages;
             displayPage(page);
           });
+        };
+
+        var displayCounter = function(){
+        	// alert(plugin.settings.objElements.length);
+        	htmlCounter = '<div class="paginateCounter">';
+
+        	htmlCounter += '<span class="paginateTotal">' + plugin.settings.objElements.length +'</span>';
+        	plugin.counter = $(htmlCounter);
+
+        	plugin.el.after(plugin.counter);
         };
 
         var displayPage = function(page, forceEffect) {
@@ -119,7 +128,13 @@
                 $('.paginateNav a', plugin).removeClass('disabled');
                 break;
             }
+
+            updateCounter();
           }
+        };
+
+        var updateCounter = function() {
+
         };
 
         var transition_default = function(offsetStart, offsetEnd) {
@@ -138,7 +153,9 @@
           plugin.el.html();
 
           // Here we go
+          displayCounter();
           displayNav();
+          
 
           page = 1;
 
@@ -160,9 +177,14 @@
     width: 300px;
   }
   
-  #paginate img {
+  #paginate a {
     display: block;
     margin-bottom: 10px;
+  }
+
+  .paginateNav,
+  .paginateCounter {
+  	display: inline;
   }
   
   .paginateNav a {
@@ -178,60 +200,60 @@
 
 <body>
   <div id="paginate">
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
-    <li>4</li>
-    <li>5</li>
-    <li>6</li>
-    <li>7</li>
-    <li>8</li>
-    <li>9</li>
-    <li>10</li>
-    <li>11</li>
-    <li>12</li>
-    <li>13</li>
-    <li>14</li>
-    <li>15</li>
-    <li>16</li>
-    <li>17</li>
-    <li>18</li>
-    <li>19</li>
-    <li>20</li>
-    <li>21</li>
-    <li>22</li>
-    <li>23</li>
-    <li>24</li>
-    <li>25</li>
-    <li>26</li>
-    <li>27</li>
-    <li>28</li>
-    <li>29</li>
-    <li>30</li>
-    <li>31</li>
-    <li>32</li>
-    <li>33</li>
-    <li>34</li>
-    <li>35</li>
-    <li>36</li>
-    <li>37</li>
-    <li>38</li>
-    <li>39</li>
-    <li>40</li>
-    <li>41</li>
-    <li>42</li>
-    <li>43</li>
-    <li>44</li>
-    <li>45</li>
-    <li>46</li>
-    <li>47</li>
-    <li>48</li>
-    <li>49</li>
-    <li>50</li>
+    <a href="http://www.google.com">1</a>
+    <a href="http://www.google.com">2</a>
+    <a href="http://www.google.com">3</a>
+    <a href="http://www.google.com">4</a>
+    <a href="http://www.google.com">5</a>
+    <a href="http://www.google.com">6</a>
+    <a href="http://www.google.com">7</a>
+    <a href="http://www.google.com">8</a>
+    <a href="http://www.google.com">9</a>
+    <a href="http://www.google.com">10</a>
+    <a href="">11</a>
+    <a href="">12</a>
+    <a href="">13</a>
+    <a href="">14</a>
+    <a href="">15</a>
+    <a href="">16</a>
+    <a href="">17</a>
+    <a href="">18</a>
+    <a href="">19</a>
+    <a href="">20</a>
+    <a href="">21</a>
+    <a href="">22</a>
+    <a href="">23</a>
+    <a href="">24</a>
+    <a href="">25</a>
+    <a href="">26</a>
+    <a href="">27</a>
+    <a href="">28</a>
+    <a href="">29</a>
+    <a href="">30</a>
+    <a href="">31</a>
+    <a href="">32</a>
+    <a href="">33</a>
+    <a href="">34</a>
+    <a href="">35</a>
+    <a href="">36</a>
+    <a href="">37</a>
+    <a href="">38</a>
+    <a href="">39</a>
+    <a href="">40</a>
+    <a href="">41</a>
+    <a href="">42</a>
+    <a href="">43</a>
+    <a href="">44</a>
+    <a href="">45</a>
+    <a href="">46</a>
+    <a href="">47</a>
+    <a href="">48</a>
+    <a href="">49</a>
+    <a href="">50</a>
   </div>
   <script>
   $('#paginate').paginate({
-    paginateElement: 'li',
+    paginateElement: 'a',
     elementsPerPage: 10,
     default: 'default'
   });
