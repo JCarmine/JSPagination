@@ -44,7 +44,7 @@
         };
 
         var displayNav = function() {
-
+        	
           htmlNav = '<div class="paginateNav">';
 
           if (plugin.settings.firstButton) {
@@ -104,6 +104,34 @@
         	plugin.el.after(plugin.counter);
         };
 
+        var getCookie = function(cname) {
+			    var name = cname + "=";
+			    var decodedCookie = decodeURIComponent(document.cookie);
+			    var ca = decodedCookie.split(';');
+			    for(var i = 0; i <ca.length; i++) {
+		        var c = ca[i];
+		        while (c.charAt(0) == ' ') {
+	            c = c.substring(1);
+		        }
+		        if (c.indexOf(name) == 0) {
+	            return c.substring(name.length, c.length);
+		        }
+			    }
+			    return "";
+				}
+
+        var setDefaultPage = function() {
+					indexCookie = getCookie(plugin.el);
+					if ( indexCookie ) {
+						page = indexCookie;
+						page = page.parseInt();
+					} else {
+						page = 1
+					}
+
+					return page;
+				};
+
         var displayPage = function(page, forceEffect) {
           if (plugin.settings.currentPage != page) {
             plugin.settings.currentPage = parseInt(page);
@@ -133,8 +161,19 @@
             }
 
             updateCounter(page);
+            setCookie(plugin.el, page, 30);
           }
         };
+
+        var setCookie = function createCookie(name,value,days) {
+			    var expires = "";
+			    if (days) {
+		        var date = new Date();
+		        date.setTime(date.getTime() + (days*24*60*60*1000));
+		        expires = "; expires=" + date.toUTCString();
+			    }
+			    document.cookie = name + "=" + value + expires + "; path=/";
+				};
 
         var updateCounter = function(page) {
         	rangeStart = (page - 1) * plugin.settings.elementsPerPage + 1;
@@ -161,8 +200,7 @@
           displayCounter();
           displayNav();
           
-
-          page = 1;
+          setDefaultPage();
 
           if (document.location.hash.indexOf('#' + plugin.settings.hashPage + ':') != -1) {
             page = parseInt(document.location.hash.replace('#' + plugin.settings.hashPage + ':', ''));
