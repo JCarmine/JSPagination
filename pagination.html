@@ -6,309 +6,307 @@
   <title>Document</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script>
-        
-  var plugin = {};
+    var plugin = {};
 
-  (function($) {
-    $.fn.paginate = function(options) {
-      var defaults = {
-        paginateElement: 'li',
-        hashPage: 'page',
-        elementsPerPage: 10,
-        effect: 'default',
-        slideOffset: 200,
-        firstButton: true,
-        firstButtonText: '<<',
-        lastButton: true,
-        lastButtonText: '>>',
-        prevButton: true,
-        prevButtonText: '<',
-        nextButton: true,
-        nextButtonText: '>'
-      }
-
-      return this.each(function(instance) {
-
-        // var plugin = {};
-        plugin.el = $(this);
-        plugin.el.addClass('paginateList');
-
-        plugin.settings = {
-          pages: 0,
-          objElements: Object,
-          currentPage: 1
+    (function($) {
+      $.fn.paginate = function(options) {
+        var defaults = {
+          paginateElement: 'li',
+          hashPage: 'page',
+          elementsPerPage: 10,
+          effect: 'default',
+          slideOffset: 200,
+          firstButton: true,
+          firstButtonText: '<<',
+          lastButton: true,
+          lastButtonText: '>>',
+          prevButton: true,
+          prevButtonText: '<',
+          nextButton: true,
+          nextButtonText: '>'
         }
 
-        var getNbOfPages = function() {
-          return Math.ceil(plugin.settings.objElements.length / plugin.settings.elementsPerPage);
-        };
+        return this.each(function(instance) {
 
-        var displayNav = function() {
-        	
-          htmlNav = '<div class="paginateNav">';
+          // var plugin = {};
+          plugin.el = $(this);
+          plugin.el.addClass('paginateList');
 
-          if (plugin.settings.firstButton) {
-            htmlNav += '<a href="#' + plugin.settings.hashPage + ':1" title="First page" rel="1" class="first">' + plugin.settings.firstButtonText + '</a>';
+          plugin.settings = {
+            pages: 0,
+            objElements: Object,
+            currentPage: 1
           }
 
-          if (plugin.settings.prevButton) {
-            htmlNav += '<a href="" title="Previous" rel="" class="prev">' + plugin.settings.prevButtonText + '</a>';
-          }
-
-          for (i = 1; i <= plugin.settings.pages; i++) {
-            htmlNav += '<a href="#' + plugin.settings.hashPage + ':' + i + '" title="Page ' + i + '" rel="' + i + '" class="page">' + i + '</a>';
+          var getNbOfPages = function() {
+            return Math.ceil(plugin.settings.objElements.length / plugin.settings.elementsPerPage);
           };
 
-          if (plugin.settings.nextButton) {
-            htmlNav += '<a href="" title="Next" rel="" class="next">' + plugin.settings.nextButtonText + '</a>';
+          var displayNav = function() {
+
+            htmlNav = '<div class="paginateNav">';
+
+            if (plugin.settings.firstButton) {
+              htmlNav += '<a href="#' + plugin.settings.hashPage + ':1" title="First page" rel="1" class="first">' + plugin.settings.firstButtonText + '</a>';
+            }
+
+            if (plugin.settings.prevButton) {
+              htmlNav += '<a href="" title="Previous" rel="" class="prev">' + plugin.settings.prevButtonText + '</a>';
+            }
+
+            for (i = 1; i <= plugin.settings.pages; i++) {
+              htmlNav += '<a href="#' + plugin.settings.hashPage + ':' + i + '" title="Page ' + i + '" rel="' + i + '" class="page">' + i + '</a>';
+            };
+
+            if (plugin.settings.nextButton) {
+              htmlNav += '<a href="" title="Next" rel="" class="next">' + plugin.settings.nextButtonText + '</a>';
+            }
+
+            if (plugin.settings.lastButton) {
+              htmlNav += '<a href="#' + plugin.settings.hashPage + ':' + plugin.settings.pages + '" title="Last page" rel="' + plugin.settings.pages + '" class="last">' + plugin.settings.lastButtonText + '</a>';
+            }
+
+            htmlNav += '</div>';
+            plugin.nav = $(htmlNav);
+            // plugin.nav.css({
+            //   'width': plugin.el.width()
+            // });
+            plugin.el.after(plugin.nav);
+
+            var elSelector = '#' + plugin.el.get(0).id + ' + ';
+
+            $(elSelector + ' .paginateNav a.page,' + elSelector + ' .paginateNav a.first,' + elSelector + ' .paginateNav a.last').on('click', function(e) {
+              e.preventDefault();
+              displayPage($(this).attr('rel'));
+            });
+
+            $('.paginateNav a.prev').on('click', function(e) {
+              e.preventDefault();
+              page = plugin.settings.currentPage > 1 ? parseInt(plugin.settings.currentPage) - 1 : 1;
+              displayPage(page);
+            });
+
+            $('.paginateNav a.next').on('click', function(e) {
+              e.preventDefault();
+              page = plugin.settings.currentPage < plugin.settings.pages ? parseInt(plugin.settings.currentPage) + 1 : plugin.settings.pages;
+              displayPage(page);
+            });
+          };
+
+          var displayCounter = function() {
+            htmlCounter = '<div class="paginateCounter">';
+
+            htmlCounter += '<span class="paginateRange"></span>';
+            htmlCounter += '<span class="paginateTotal">' + plugin.settings.objElements.length + '</span>';
+
+            plugin.counter = $(htmlCounter);
+            plugin.el.after(plugin.counter);
+          };
+
+          var getCookie = function(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+              }
+            }
+            return "";
           }
 
-          if (plugin.settings.lastButton) {
-            htmlNav += '<a href="#' + plugin.settings.hashPage + ':' + plugin.settings.pages + '" title="Last page" rel="' + plugin.settings.pages + '" class="last">' + plugin.settings.lastButtonText + '</a>';
-          }
+          var setDefaultPage = function() {
+            indexCookie = getCookie(plugin.el[0].id);
 
-          htmlNav += '</div>';
-          plugin.nav = $(htmlNav);
-          // plugin.nav.css({
-          //   'width': plugin.el.width()
-          // });
-          plugin.el.after(plugin.nav);
-
-          var elSelector = '#' + plugin.el.get(0).id + ' + ';
-
-          $(elSelector + ' .paginateNav a.page,' + elSelector + ' .paginateNav a.first,' + elSelector + ' .paginateNav a.last').on('click', function(e) {
-            e.preventDefault();
-            displayPage($(this).attr('rel'));
-          });
-
-          $('.paginateNav a.prev').on('click', function(e) {
-            e.preventDefault();
-            page = plugin.settings.currentPage > 1 ? parseInt(plugin.settings.currentPage) - 1 : 1;
-            displayPage(page);
-          });
-
-          $('.paginateNav a.next').on('click', function(e) {
-            e.preventDefault();
-            page = plugin.settings.currentPage < plugin.settings.pages ? parseInt(plugin.settings.currentPage) + 1 : plugin.settings.pages;
-            displayPage(page);
-          });
-        };
-
-        var displayCounter = function(){
-        	htmlCounter = '<div class="paginateCounter">';
-
-        	htmlCounter += '<span class="paginateRange"></span>';
-        	htmlCounter += '<span class="paginateTotal">' + plugin.settings.objElements.length +'</span>';
-        	
-        	plugin.counter = $(htmlCounter);
-        	plugin.el.after(plugin.counter);
-        };
-
-        var getCookie = function(cname) {
-			    var name = cname + "=";
-			    var decodedCookie = decodeURIComponent(document.cookie);
-			    var ca = decodedCookie.split(';');
-			    for(var i = 0; i <ca.length; i++) {
-		        var c = ca[i];
-		        while (c.charAt(0) == ' ') {
-	            c = c.substring(1);
-		        }
-		        if (c.indexOf(name) == 0) {
-	            return c.substring(name.length, c.length);
-		        }
-			    }
-			    return "";
-				}
-
-        var setDefaultPage = function() {
-					indexCookie = getCookie(plugin.el[0].id);
-					
-					if ( indexCookie ) {
-						page = indexCookie;
-						page = parseInt(page);
-					} else {
-						page = 1
-					}
-
-					return page;
-				};
-
-        var displayPage = function(page, forceEffect) {
-          if (plugin.settings.currentPage != page) {
-            plugin.settings.currentPage = parseInt(page);
-            offsetStart = (page - 1) * plugin.settings.elementsPerPage;
-            offsetEnd = page * plugin.settings.elementsPerPage;
-            if (typeof(forceEffect) != 'undefined') {
-              eval("transition_" + forceEffect + "(" + offsetStart + ", " + offsetEnd + ")");
+            if (indexCookie) {
+              page = indexCookie;
+              page = parseInt(page);
             } else {
-              eval("transition_" + plugin.settings.effect + "(" + offsetStart + ", " + offsetEnd + ")");
+              page = 1
             }
 
-            plugin.nav.find('.current').removeClass('current');
-            plugin.nav.find('a.page:eq(' + (page - 1) + ')').addClass('current');
+            return page;
+          };
 
-            switch (plugin.settings.currentPage) {
-              case 1:
-                $('.paginateNav a').removeClass('disabled');
-                $('.paginateNav a.first, .paginateNav a.prev').addClass('disabled');
-                break;
-              case plugin.settings.pages:
-                $('.paginateNav a').removeClass('disabled');
-                $('.paginateNav a.last, .paginateNav a.next').addClass('disabled');
-                break;
-              default:
-                $('.paginateNav a').removeClass('disabled');
-                break;
+          var displayPage = function(page, forceEffect) {
+            if (plugin.settings.currentPage != page) {
+              plugin.settings.currentPage = parseInt(page);
+              offsetStart = (page - 1) * plugin.settings.elementsPerPage;
+              offsetEnd = page * plugin.settings.elementsPerPage;
+              if (typeof(forceEffect) != 'undefined') {
+                eval("transition_" + forceEffect + "(" + offsetStart + ", " + offsetEnd + ")");
+              } else {
+                eval("transition_" + plugin.settings.effect + "(" + offsetStart + ", " + offsetEnd + ")");
+              }
+
+              plugin.nav.find('.current').removeClass('current');
+              plugin.nav.find('a.page:eq(' + (page - 1) + ')').addClass('current');
+
+              switch (plugin.settings.currentPage) {
+                case 1:
+                  $('.paginateNav a').removeClass('disabled');
+                  $('.paginateNav a.first, .paginateNav a.prev').addClass('disabled');
+                  break;
+                case plugin.settings.pages:
+                  $('.paginateNav a').removeClass('disabled');
+                  $('.paginateNav a.last, .paginateNav a.next').addClass('disabled');
+                  break;
+                default:
+                  $('.paginateNav a').removeClass('disabled');
+                  break;
+              }
+
+              updateCounter(page);
+              setCookie(plugin.el[0].id, page, 30);
+            }
+          };
+
+          var setCookie = function createCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+              var date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+          };
+
+          var updateCounter = function(page) {
+            rangeStart = (page - 1) * plugin.settings.elementsPerPage + 1;
+            rangeEnd = getNbOfPages() == page ? plugin.settings.objElements.length : page * plugin.settings.elementsPerPage;
+            $('.paginateRange').text(rangeStart + "-" + rangeEnd);
+          };
+
+          var transition_default = function(offsetStart, offsetEnd) {
+            plugin.currentElements.hide();
+            plugin.currentElements = plugin.settings.objElements.slice(offsetStart, offsetEnd).clone();
+            plugin.el.html(plugin.currentElements);
+            plugin.currentElements.show();
+          };
+
+          plugin.settings = $.extend({}, defaults, options);
+
+          plugin.currentElements = $([]);
+          plugin.settings.objElements = plugin.el.find(plugin.settings.paginateElement);
+          plugin.settings.pages = getNbOfPages();
+          if (plugin.settings.pages > 1) {
+            plugin.el.html();
+
+            displayCounter();
+            displayNav();
+
+            setDefaultPage();
+
+            if (document.location.hash.indexOf('#' + plugin.settings.hashPage + ':') != -1) {
+              page = parseInt(document.location.hash.replace('#' + plugin.settings.hashPage + ':', ''));
+              if (page.length <= 0 || page < 1 || page > plugin.settings.pages) {
+                page = 1;
+              }
             }
 
-            updateCounter(page);
-            setCookie(plugin.el[0].id, page, 30);
+            displayPage(page, 'default');
           }
-        };
-
-        var setCookie = function createCookie(name,value,days) {
-			    var expires = "";
-			    if (days) {
-		        var date = new Date();
-		        date.setTime(date.getTime() + (days*24*60*60*1000));
-		        expires = "; expires=" + date.toUTCString();
-			    }
-			    document.cookie = name + "=" + value + expires + "; path=/";
-				};
-
-        var updateCounter = function(page) {
-        	rangeStart = (page - 1) * plugin.settings.elementsPerPage + 1;
-        	rangeEnd = getNbOfPages() == page ? plugin.settings.objElements.length : page * plugin.settings.elementsPerPage;
-        	$('.paginateRange').text(rangeStart + "-" + rangeEnd);
-        };
-
-        var transition_default = function(offsetStart, offsetEnd) {
-          plugin.currentElements.hide();
-          plugin.currentElements = plugin.settings.objElements.slice(offsetStart, offsetEnd).clone();
-          plugin.el.html(plugin.currentElements);
-          plugin.currentElements.show();
-        };
-
-        plugin.settings = $.extend({}, defaults, options);
-
-        plugin.currentElements = $([]);
-        plugin.settings.objElements = plugin.el.find(plugin.settings.paginateElement);
-        plugin.settings.pages = getNbOfPages();
-        if (plugin.settings.pages > 1) {
-          plugin.el.html();
-
-          displayCounter();
-          displayNav();
-          
-          setDefaultPage();
-
-          if (document.location.hash.indexOf('#' + plugin.settings.hashPage + ':') != -1) {
-            page = parseInt(document.location.hash.replace('#' + plugin.settings.hashPage + ':', ''));
-            if (page.length <= 0 || page < 1 || page > plugin.settings.pages) {
-              page = 1;
-            }
-          }
-
-          displayPage(page, 'default');
-        }
-      });
-    };
-  })(jQuery);
+        });
+      };
+    })(jQuery);
   </script>
 
   <style>
-		main a,
-		main span {
-			font-size: 20px;
-			margin-bottom: 10px;
-	  	padding: 10px;
-	  	text-decoration: none;
-	  	color: rgb(0, 0, 238);
-		}
+    main a,
+    main span {
+      font-size: 20px;
+      margin-bottom: 10px;
+      padding: 10px;
+      text-decoration: none;
+      color: rgb(0, 0, 238);
+    }
 
-	  #faq_questions {
-	  	padding: 0;
-	    list-style: none;
-	  }
+    #faq_questions {
+      padding: 0;
+      list-style: none;
+    }
 
-	  .paginateNav,
-	  .paginateCounter {
-	  	display: inline;
-	  }
-	  
-	  .paginateNav a.current {
-	    font-weight: bold;
-	    text-decoration: underline;
-	  }
+    .paginateNav,
+    .paginateCounter {
+      display: inline;
+    }
 
-	  .paginateNav a.disabled {
-	    color: #cccccc;
-	    cursor: default;
-	  }
+    .paginateNav a.current {
+      font-weight: bold;
+      text-decoration: underline;
+    }
 
-	  .paginateCounter span {
-	  	color: #4ba34c;
-	  	cursor: default;
-	  }
-	</style>
+    .paginateNav a.disabled {
+      color: #cccccc;
+      cursor: default;
+    }
+
+    .paginateCounter span {
+      color: #4ba34c;
+      cursor: default;
+    }
+  </style>
 </head>
 
 <body>
   <main>
-		<ul id="faq_questions">
-		  <li class="faq_question"><a href="">1</a></li>
-			<li class="faq_question"><a href="">2</a></li>
-			<li class="faq_question"><a href="">3</a></li>
-			<li class="faq_question"><a href="">4</a></li>
-			<li class="faq_question"><a href="">5</a></li>
-			<li class="faq_question"><a href="">6</a></li>
-			<li class="faq_question"><a href="">7</a></li>
-			<li class="faq_question"><a href="">8</a></li>
-			<li class="faq_question"><a href="">9</a></li>
-			<li class="faq_question"><a href="">10</a></li>
-			<li class="faq_question"><a href="">11</a></li>
-			<li class="faq_question"><a href="">12</a></li>
-			<li class="faq_question"><a href="">13</a></li>
-			<li class="faq_question"><a href="">14</a></li>
-			<li class="faq_question"><a href="">15</a></li>
-			<li class="faq_question"><a href="">16</a></li>
-			<li class="faq_question"><a href="">17</a></li>
-			<li class="faq_question"><a href="">18</a></li>
-			<li class="faq_question"><a href="">19</a></li>
-			<li class="faq_question"><a href="">20</a></li>
-			<li class="faq_question"><a href="">21</a></li>
-			<li class="faq_question"><a href="">22</a></li>
-			<li class="faq_question"><a href="">23</a></li>
-			<li class="faq_question"><a href="">24</a></li>
-			<li class="faq_question"><a href="">25</a></li>
-			<li class="faq_question"><a href="">26</a></li>
-			<li class="faq_question"><a href="">27</a></li>
-			<li class="faq_question"><a href="">28</a></li>
-			<li class="faq_question"><a href="">29</a></li>
-			<li class="faq_question"><a href="">30</a></li>
-			<li class="faq_question"><a href="">31</a></li>
-			<li class="faq_question"><a href="">32</a></li>
-			<li class="faq_question"><a href="">33</a></li>
-			<li class="faq_question"><a href="">34</a></li>
-			<li class="faq_question"><a href="">35</a></li>
-			<li class="faq_question"><a href="">36</a></li>
-			<li class="faq_question"><a href="">37</a></li>
-			<li class="faq_question"><a href="">38</a></li>
-			<li class="faq_question"><a href="">39</a></li>
-			<li class="faq_question"><a href="">40</a></li>
-			<li class="faq_question"><a href="">41</a></li>
-			<li class="faq_question"><a href="">42</a></li>
-			<li class="faq_question"><a href="">43</a></li>
-		</ul>
-	</main>
+    <ul id="faq_questions">
+      <li class="faq_question"><a href="">1</a></li>
+      <li class="faq_question"><a href="">2</a></li>
+      <li class="faq_question"><a href="">3</a></li>
+      <li class="faq_question"><a href="">4</a></li>
+      <li class="faq_question"><a href="">5</a></li>
+      <li class="faq_question"><a href="">6</a></li>
+      <li class="faq_question"><a href="">7</a></li>
+      <li class="faq_question"><a href="">8</a></li>
+      <li class="faq_question"><a href="">9</a></li>
+      <li class="faq_question"><a href="">10</a></li>
+      <li class="faq_question"><a href="">11</a></li>
+      <li class="faq_question"><a href="">12</a></li>
+      <li class="faq_question"><a href="">13</a></li>
+      <li class="faq_question"><a href="">14</a></li>
+      <li class="faq_question"><a href="">15</a></li>
+      <li class="faq_question"><a href="">16</a></li>
+      <li class="faq_question"><a href="">17</a></li>
+      <li class="faq_question"><a href="">18</a></li>
+      <li class="faq_question"><a href="">19</a></li>
+      <li class="faq_question"><a href="">20</a></li>
+      <li class="faq_question"><a href="">21</a></li>
+      <li class="faq_question"><a href="">22</a></li>
+      <li class="faq_question"><a href="">23</a></li>
+      <li class="faq_question"><a href="">24</a></li>
+      <li class="faq_question"><a href="">25</a></li>
+      <li class="faq_question"><a href="">26</a></li>
+      <li class="faq_question"><a href="">27</a></li>
+      <li class="faq_question"><a href="">28</a></li>
+      <li class="faq_question"><a href="">29</a></li>
+      <li class="faq_question"><a href="">30</a></li>
+      <li class="faq_question"><a href="">31</a></li>
+      <li class="faq_question"><a href="">32</a></li>
+      <li class="faq_question"><a href="">33</a></li>
+      <li class="faq_question"><a href="">34</a></li>
+      <li class="faq_question"><a href="">35</a></li>
+      <li class="faq_question"><a href="">36</a></li>
+      <li class="faq_question"><a href="">37</a></li>
+      <li class="faq_question"><a href="">38</a></li>
+      <li class="faq_question"><a href="">39</a></li>
+      <li class="faq_question"><a href="">40</a></li>
+      <li class="faq_question"><a href="">41</a></li>
+      <li class="faq_question"><a href="">42</a></li>
+      <li class="faq_question"><a href="">43</a></li>
+    </ul>
+  </main>
 
   <script>
-  $('#faq_questions').paginate({
-    elementsPerPage: 10,
-    default: 'default'
-  });
+    $('#faq_questions').paginate({
+      elementsPerPage: 10,
+      default: 'default'
+    });
   </script>
 </body>
 
 </html>
-
